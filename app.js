@@ -1,27 +1,40 @@
 const mongoose = require("mongoose");
-
-// This file uses Express to creat a server
-// First two lines create a new express server
 const express = require("express");
 const app = express();
-const bodyParser = require("body-parser");
-
-// Bring in the Key for Mongo
 const db = require("./config/keys").mongoURI;
+const users = require("./routes/api/users");
+const tweets = require("./routes/api/tweets");
+const User = require("./models/User");
+const bodyParser = require("body-parser");
 
 mongoose
   .connect(db, { useNewUrlParser: true })
   .then(() => console.log("Connected to MongoDB successfully"))
   .catch(err => console.log(err));
 
-// Tell express to use the newly imported routes
-const users = require("./routes/api/users");
-const tweets = require("./routes/api/tweets");
+app.use(bodyParser.urlencoded({
+  extended: false
+}))
+
+app.use(bodyParser.json());
+
+//prettier-ignore
+app.get("/", (req, res) => {
+  const user = new User({
+    handle: 'chris',
+    email: "chris@gmail.com",
+    password: 'chris1234'
+  })
+  user.save();
+  res.send("Hey Young World, The World is Yours")
+});
+
 
 app.use("/api/users", users);
 app.use("/api/tweets", tweets);
 // Creates a basic route so we can render some info to page
-app.get("/", (req, res) => res.send("Hey Young World, The World is Yours"));
+
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
